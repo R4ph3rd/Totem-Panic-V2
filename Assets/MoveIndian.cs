@@ -19,6 +19,8 @@ public class MoveIndian : MonoBehaviour
 
     public GameObject arrow ;
     public GameObject slash ;
+    public GameObject fire ;
+    private Vector3 firePos ;
 
     // Start is called before the first frame update
     void Start() {
@@ -26,6 +28,8 @@ public class MoveIndian : MonoBehaviour
         thresholdHeld = .1f ;
         speed = originSpeed ;
         held = false ;
+
+        firePos = fire.transform.position ;
     }
 
     // Update is called once per frame
@@ -57,33 +61,27 @@ public class MoveIndian : MonoBehaviour
         }
 
         if (Input.GetKey("space") && held) {
-            if (Time.timeSinceLevelLoad - spacePressedTime >= thresholdHeld) {
+            if (Time.timeSinceLevelLoad - spacePressedTime >= thresholdHeld && Time.frameCount % 15 == 0) {
                 speed = speed > 0 ? slowSpeed : - slowSpeed ;
 
-                // Vector3 pos = transform.position ;
-                GameObject fire = GameObject.FindWithTag("fire");
-
-                // Instantiate(arrow, transform.position, transform.rotation) as GameObject ;
-                // Physics.IgnoreCollision(arrow.GetComponent<Collider>(), fire.GetComponent<Collider>());
-                // RigidBody arrow_ = (RigidBody)arrow_.GetComponent<Rigidbody>();
-                // arrow_.AddForce()
+                Vector3 dir = firePos - transform.position ;
+                dir.y = 0 ;
+                dir = dir.normalized ;
+                
+                GameObject arrow_ = Instantiate(arrow, transform.position, Quaternion.identity) ;
+                // Debug.DrawRay(transform.position, dir * 1000, Color.blue, 1f);
+                Quaternion rotation = Quaternion.LookRotation(dir, transform.up) ;
+                arrow_.transform.rotation = rotation ;
+                arrow_.GetComponent<Rigidbody>().AddForce(dir * 1000);
             }
         }
     }
 
 
     void kickTotem(){
-        // ArrayList totems = GameObject.FindGameObjectsWithTag("totem") ;
-
         RaycastHit hit;
-        // Vector3 dir = Vector3.Cross(transform.TransformDirection(Vector3.forward), Vector3.up).normalized ;
         Vector3 dir = new Vector3(transform.TransformDirection(Vector3.forward).z, 0,  - transform.TransformDirection(Vector3.forward).x);
-        Debug.DrawRay(transform.position, dir * 1000, Color.red, 5f);
-
-        // foreach (GameObject totem in GameObject.FindGameObjectsWithTag("totem")){
-            
-        //     if (totem)
-        // }
+        // Debug.DrawRay(transform.position, dir * 1000, Color.red, 5f);
 
         if (Physics.Raycast(transform.position, dir * 100, out hit, 100.0f)){
             if (hit.transform.tag == "totem")  {
