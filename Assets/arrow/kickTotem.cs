@@ -16,6 +16,9 @@ public class kickTotem : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         if (other.CompareTag("totem")){
+            GetComponent<AudioSource>().Play() ;
+            gameManager.removeTotemFromList(other.GetComponent<TotemInstance>().id);
+            
             Destroy(other.gameObject);
             Destroy(gameObject);
         }
